@@ -58,6 +58,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::resource('issues', AdminIssueController::class);
     Route::resource('parking', ParkingController::class);
     Route::resource('notifications', AdminNotificationController::class);
+    Route::get('meter-readings/latest-value', [MeterReadingController::class, 'getLatestValue'])->name('meter-readings.latest-value');
     Route::resource('meter-readings', MeterReadingController::class);
 });
 
