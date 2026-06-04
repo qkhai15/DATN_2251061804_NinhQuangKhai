@@ -1,0 +1,14 @@
+PHÂN TÍCH THIẾT KẾ BAN ĐẦU
+1. Danh sách các Tác nhân (Actors)
+2. Bảng Chức năng hệ thống (Use Case List)
+Ngoài các chức năng cũ, chúng ta bổ sung các tính năng giúp hệ thống vận hành khép kín hơn:
+A. Nhóm chức năng Quản lý (Chủ trọ)
+Quản lý cơ sở hạ tầng: Quản lý danh sách tòa nhà (nếu có nhiều dãy trọ), quản lý tài sản trong phòng (giường, tủ, điều hòa).
+Quản lý Bãi xe & Thẻ xe: Cấp phát mã số xe, quản lý số lượng xe tối đa trong hầm.
+Duyệt thông báo tự động: Hệ thống tự động gửi nhắc nợ qua Email/Zalo khi đến hạn thanh toán.
+Báo cáo & Thống kê: Biểu đồ doanh thu theo tháng/năm, thống kê tỉ lệ phòng trống, biểu đồ tiêu thụ điện/nước toàn dãy.
+B. Nhóm chức năng Tiện ích (Người thuê)
+Quản lý thành viên (Ở ghép): Người thuê chính có thể thêm thông tin người ở cùng để khai báo tạm trú.
+Hòm thư góp ý/Khiếu nại: Gửi phản hồi về an ninh, vệ sinh (Chatbot có thể phân loại các ý kiến này).
+Đăng ký dịch vụ thêm: Đăng ký thêm thẻ xe, dịch vụ dọn phòng, hoặc giặt ủi.
+3. Bảng phân loại Use Case và Tác nhân

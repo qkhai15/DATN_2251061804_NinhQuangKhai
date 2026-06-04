@@ -31,11 +31,11 @@
         <div class="grid grid-cols-2 gap-8">
             <div class="bg-gray-50 p-6 rounded-2xl">
                 <span class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-2">Chỉ số cũ</span>
-                <p class="text-3xl font-black text-gray-400">{{ number_format($meter_reading->old_value, 0) }}</p>
+                <p class="text-3xl font-black text-gray-400">{{ $meter_reading->old_value }}</p>
             </div>
             <div class="bg-indigo-50 p-6 rounded-2xl">
                 <span class="text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-2">Chỉ số mới</span>
-                <p class="text-3xl font-black text-indigo-600">{{ number_format($meter_reading->new_value, 0) }}</p>
+                <p class="text-3xl font-black text-indigo-600">{{ $meter_reading->new_value }}</p>
             </div>
         </div>
 
@@ -45,7 +45,7 @@
             </div>
             <div>
                 <span class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest block mb-1">Mức sử dụng</span>
-                <p class="text-3xl font-black">{{ number_format($meter_reading->new_value - $meter_reading->old_value, 0) }} <span class="text-sm font-bold opacity-60">{{ $meter_reading->type == 'electricity' ? 'kWh' : 'm³' }}</span></p>
+                <p class="text-3xl font-black">{{ $meter_reading->new_value - $meter_reading->old_value }} <span class="text-sm font-bold opacity-60">{{ $meter_reading->type == 'electricity' ? 'kWh' : 'm³' }}</span></p>
             </div>
         </div>
 

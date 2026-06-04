@@ -36,13 +36,31 @@
                 <input type="date" name="read_date" required value="{{ date('Y-m-d') }}" class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm font-bold text-gray-900 transition">
             </div>
         </div>
+
+        <!-- Latest Reading Info & Usage Calculation -->
+        <div id="latest-reading-info" class="hidden p-5 bg-slate-50 rounded-[2rem] border border-gray-100 flex items-center justify-between transition-all duration-300">
+            <div>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Chỉ số cũ gần nhất</p>
+                <p id="latest-value-text" class="text-xl font-black text-slate-700 mt-1">—</p>
+            </div>
+            <div id="usage-calc" class="hidden text-right">
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Lượng tiêu thụ</p>
+                <p id="usage-value-text" class="text-xl font-black text-indigo-600 mt-1">—</p>
+            </div>
+        </div>
+
+        {{-- OCR Scan Section --}}
         <div class="relative">
             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3 pl-1">Chỉ số mới</label>
             <div class="flex items-center gap-3">
                 <div class="relative flex-1">
-                    <input type="number" id="new_value" name="new_value" required class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-base font-black text-gray-900 transition" placeholder="VD: 1250">
+                    <input type="number" id="new_value" name="new_value" required
+                        class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none text-base font-black text-gray-900 transition"
+                        placeholder="VD: 9761">
                 </div>
-                <button type="button" id="scan-ocr-btn" class="flex-shrink-0 p-4 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition border border-indigo-100 group relative" title="Quét số từ ảnh (OCR)">
+                <button type="button" id="scan-ocr-btn"
+                    class="flex-shrink-0 p-4 bg-indigo-50 text-indigo-600 rounded-2xl hover:bg-indigo-100 transition border border-indigo-100 group relative"
+                    title="Chụp ảnh công tơ để tự động nhận số">
                     <i class="fas fa-camera text-xl group-hover:scale-110 transition-transform"></i>
                     <span id="ocr-loading" class="hidden absolute inset-0 flex items-center justify-center bg-indigo-100 rounded-2xl">
                         <i class="fas fa-circle-notch fa-spin"></i>
@@ -50,54 +68,209 @@
                 </button>
             </div>
             <input type="file" id="ocr-image-input" accept="image/*" capture="environment" class="hidden">
-            <p class="text-[10px] text-gray-400 font-medium italic mt-2 pl-1">* Hệ thống sẽ tự động tính toán dựa trên chỉ số cũ gần nhất.</p>
+
+            {{-- Preview + Result Panel (hidden by default) --}}
+            <div id="ocr-panel" class="hidden mt-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-3">
+                <div class="flex gap-4 items-start">
+                    <img id="ocr-preview" src="" alt="Preview" class="w-32 h-20 object-cover rounded-xl border border-gray-200 flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Kết quả nhận diện</p>
+                        <p id="ocr-result-text" class="text-2xl font-black text-indigo-700 tracking-widest">—</p>
+                        <div id="ocr-confidence-bar" class="mt-2">
+                            <div class="flex justify-between text-[10px] text-gray-400 mb-1">
+                                <span>Độ tin cậy</span>
+                                <span id="ocr-confidence-pct">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div id="ocr-confidence-fill" class="h-1.5 rounded-full bg-indigo-500 transition-all" style="width:0%"></div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 mt-3">
+                            <button type="button" id="ocr-accept-btn"
+                                class="px-4 py-2 bg-emerald-500 text-white text-xs font-bold rounded-xl hover:bg-emerald-600 transition">
+                                <i class="fas fa-check mr-1"></i> Dùng số này
+                            </button>
+                            <button type="button" id="ocr-retry-btn"
+                                class="px-4 py-2 bg-gray-200 text-gray-700 text-xs font-bold rounded-xl hover:bg-gray-300 transition">
+                                <i class="fas fa-redo mr-1"></i> Chụp lại
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p id="ocr-tip" class="text-[10px] text-amber-600 font-medium hidden">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    Độ tin cậy thấp. Hãy kiểm tra lại số hoặc chụp gần hơn vào vùng số đen.
+                </p>
+            </div>
+
+            {{-- Tips --}}
+            <div class="mt-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">
+                    <i class="fas fa-lightbulb mr-1"></i> Mẹo chụp ảnh chuẩn
+                </p>
+                <ul class="text-[10px] text-blue-500 space-y-0.5 list-disc pl-4">
+                    <li>Chụp thẳng góc vào <strong>vùng số đen</strong> trên mặt công tơ</li>
+                    <li>Đảm bảo ánh sáng đủ, không bị lóa hoặc tối</li>
+                    <li>Giữ điện thoại thẳng, tránh nghiêng</li>
+                </ul>
+            </div>
+            <p class="text-[10px] text-gray-400 font-medium italic mt-2 pl-1">* Hệ thống tự động tính sản lượng dựa trên chỉ số cũ gần nhất.</p>
         </div>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const scanBtn = document.getElementById('scan-ocr-btn');
-                const imageInput = document.getElementById('ocr-image-input');
-                const newValueInput = document.getElementById('new_value');
-                const loadingIcon = document.getElementById('ocr-loading');
+        document.addEventListener('DOMContentLoaded', function () {
+            const scanBtn       = document.getElementById('scan-ocr-btn');
+            const imageInput    = document.getElementById('ocr-image-input');
+            const newValueInput = document.getElementById('new_value');
+            const loadingIcon   = document.getElementById('ocr-loading');
+            const ocrPanel      = document.getElementById('ocr-panel');
+            const ocrPreview    = document.getElementById('ocr-preview');
+            const ocrResultText = document.getElementById('ocr-result-text');
+            const ocrConfPct    = document.getElementById('ocr-confidence-pct');
+            const ocrConfFill   = document.getElementById('ocr-confidence-fill');
+            const ocrAcceptBtn  = document.getElementById('ocr-accept-btn');
+            const ocrRetryBtn   = document.getElementById('ocr-retry-btn');
+            const ocrTip        = document.getElementById('ocr-tip');
 
-                scanBtn.addEventListener('click', () => imageInput.click());
+            const roomSelect       = document.querySelector('select[name="room_id"]');
+            const typeSelect       = document.querySelector('select[name="type"]');
+            const latestReadingInfo = document.getElementById('latest-reading-info');
+            const latestValueText  = document.getElementById('latest-value-text');
+            const usageCalc        = document.getElementById('usage-calc');
+            const usageValueText   = document.getElementById('usage-value-text');
 
-                imageInput.addEventListener('change', async function() {
-                    if (this.files && this.files[0]) {
-                        const file = this.files[0];
-                        const formData = new FormData();
-                        formData.append('image', file);
+            let pendingValue = null;
+            let oldReadingValue = 0;
 
-                        loadingIcon.classList.remove('hidden');
-                        scanBtn.disabled = true;
+            async function updateLatestReading() {
+                const roomId = roomSelect.value;
+                const type = typeSelect.value;
+                const unit = type === 'electricity' ? ' kWh' : ' m³';
 
-                        try {
-                            const response = await fetch('http://127.0.0.1:5000/ocr', {
-                                method: 'POST',
-                                body: formData
-                            });
+                if (!roomId || !type) {
+                    latestReadingInfo.classList.add('hidden');
+                    oldReadingValue = 0;
+                    updateUsageDisplay();
+                    return;
+                }
 
-                            const result = await response.json();
-
-                            if (result.success && result.data) {
-                                newValueInput.value = result.data.value;
-                                // Visual feedback for success
-                                newValueInput.classList.add('ring-2', 'ring-emerald-500');
-                                setTimeout(() => newValueInput.classList.remove('ring-2', 'ring-emerald-500'), 2000);
-                            } else {
-                                alert(result.message || 'Không thể nhận diện được số. Vui lòng chụp rõ hơn hoặc nhập tay.');
-                            }
-                        } catch (error) {
-                            console.error('OCR Error:', error);
-                            alert('Không kết nối được với máy chủ OCR. Hãy đảm bảo terminal AI đang chạy trên cổng 5000.');
-                        } finally {
-                            loadingIcon.classList.add('hidden');
-                            scanBtn.disabled = false;
-                            imageInput.value = ''; // Reset input
-                        }
+                try {
+                    const response = await fetch(`{{ route('meter-readings.latest-value') }}?room_id=${roomId}&type=${type}`);
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        oldReadingValue = parseFloat(data.latest_value);
+                        latestValueText.textContent = oldReadingValue + unit;
+                        latestReadingInfo.classList.remove('hidden');
+                        updateUsageDisplay();
                     }
-                });
+                } catch (error) {
+                    console.error('Lỗi khi lấy chỉ số cũ:', error);
+                }
+            }
+
+            function updateUsageDisplay() {
+                const newValue = parseFloat(newValueInput.value);
+                const type = typeSelect.value;
+                const unit = type === 'electricity' ? ' kWh' : ' m³';
+
+                if (!isNaN(newValue) && newValue >= oldReadingValue) {
+                    const usage = newValue - oldReadingValue;
+                    usageValueText.textContent = `+${usage.toLocaleString()}${unit}`;
+                    usageCalc.classList.remove('hidden');
+                } else {
+                    usageCalc.classList.add('hidden');
+                }
+            }
+
+            roomSelect.addEventListener('change', updateLatestReading);
+            typeSelect.addEventListener('change', updateLatestReading);
+            newValueInput.addEventListener('input', updateUsageDisplay);
+
+            scanBtn.addEventListener('click', () => imageInput.click());
+            ocrRetryBtn.addEventListener('click', () => imageInput.click());
+
+            imageInput.addEventListener('change', async function () {
+                if (!this.files || !this.files[0]) return;
+
+                const file = this.files[0];
+
+                // Show preview immediately
+                const objectUrl = URL.createObjectURL(file);
+                ocrPreview.src = objectUrl;
+                ocrPanel.classList.remove('hidden');
+                ocrResultText.textContent = '…';
+                ocrConfPct.textContent = '';
+                ocrConfFill.style.width = '0%';
+                ocrTip.classList.add('hidden');
+
+                const formData = new FormData();
+                formData.append('image', file);
+
+                loadingIcon.classList.remove('hidden');
+                scanBtn.disabled = true;
+                ocrAcceptBtn.disabled = true;
+
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/ocr', {
+                        method: 'POST',
+                        body: formData,
+                    });
+
+                    const result = await response.json();
+                    console.log('[OCR Result]', result);
+
+                    if (result.success) {
+                        // Support both {data: {value}} and flat {result}
+                        const value = result.data?.value ?? result.result ?? null;
+                        const conf  = result.data?.confidence ?? result.confidence ?? 0;
+
+                        if (value) {
+                            pendingValue = value;
+                            const typeValue = document.querySelector('select[name="type"]').value;
+                            const unitText = typeValue === 'electricity' ? ' kWh' : ' m³';
+                            ocrResultText.textContent = value + unitText;
+
+                            const pct = Math.round(conf * 100);
+                            ocrConfPct.textContent = pct + '%';
+                            ocrConfFill.style.width = pct + '%';
+                            ocrConfFill.className = 'h-1.5 rounded-full transition-all ' +
+                                (pct >= 70 ? 'bg-emerald-500' : pct >= 40 ? 'bg-amber-400' : 'bg-red-400');
+
+                            ocrAcceptBtn.disabled = false;
+                            if (pct < 60) ocrTip.classList.remove('hidden');
+                        } else {
+                            ocrResultText.textContent = 'Không đọc được';
+                            ocrTip.classList.remove('hidden');
+                        }
+                    } else {
+                        ocrResultText.textContent = 'Thất bại';
+                        ocrTip.classList.remove('hidden');
+                        console.warn('[OCR] Failed:', result.message);
+                    }
+                } catch (error) {
+                    console.error('[OCR] Connection error:', error);
+                    ocrResultText.textContent = 'Lỗi kết nối';
+                    ocrPanel.classList.add('hidden');
+                    alert('Không kết nối được server OCR (cổng 5000). Hãy khởi động lại terminal AI.');
+                } finally {
+                    loadingIcon.classList.add('hidden');
+                    scanBtn.disabled = false;
+                    imageInput.value = '';
+                }
             });
+
+            ocrAcceptBtn.addEventListener('click', function () {
+                if (pendingValue !== null) {
+                    newValueInput.value = pendingValue;
+                    updateUsageDisplay();
+                    newValueInput.classList.add('ring-2', 'ring-emerald-500');
+                    setTimeout(() => newValueInput.classList.remove('ring-2', 'ring-emerald-500'), 2000);
+                    ocrPanel.classList.add('hidden');
+                    pendingValue = null;
+                }
+            });
+        });
         </script>
         <div class="pt-6">
             <button type="submit" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition shadow-xl shadow-indigo-100">

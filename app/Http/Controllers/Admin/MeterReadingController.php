@@ -67,6 +67,24 @@ class MeterReadingController extends Controller
         return redirect()->route('meter-readings.index')->with('success', 'Cập nhật chỉ số thành công.');
     }
 
+    public function getLatestValue(Request $request)
+    {
+        $request->validate([
+            'room_id' => 'required|exists:rooms,id',
+            'type' => 'required|in:electricity,water',
+        ]);
+
+        $latest = MeterReading::where('room_id', $request->room_id)
+            ->where('type', $request->type)
+            ->orderBy('read_date', 'desc')
+            ->first();
+
+        return response()->json([
+            'success' => true,
+            'latest_value' => $latest ? $latest->new_value : 0,
+        ]);
+    }
+
     public function destroy(MeterReading $meter_reading)
     {
         $meter_reading->delete();

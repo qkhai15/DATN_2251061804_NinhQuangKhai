@@ -45,10 +45,10 @@
                         </span>
                         @endif
                     </td>
-                    <td class="px-8 py-6 font-medium text-gray-400 italic">{{ number_format($reading->old_value, 0) }}</td>
-                    <td class="px-8 py-6 font-black text-gray-900">{{ number_format($reading->new_value, 0) }}</td>
+                    <td class="px-8 py-6 font-medium text-gray-400 italic">{{ $reading->old_value }}</td>
+                    <td class="px-8 py-6 font-black text-gray-900">{{ $reading->new_value }}</td>
                     <td class="px-8 py-6">
-                        <span class="font-black text-indigo-600">{{ number_format($reading->new_value - $reading->old_value, 0) }}</span>
+                        <span class="font-black text-indigo-600">{{ $reading->new_value - $reading->old_value }}</span>
                         <span class="text-[10px] text-gray-400 font-bold ml-1 uppercase">{{ $reading->type == 'electricity' ? 'kWh' : 'm3' }}</span>
                     </td>
                     <td class="px-8 py-6 text-sm text-gray-500 font-medium">
@@ -58,7 +58,7 @@
                         <form action="{{ route('meter-readings.destroy', $reading) }}" method="POST" class="inline">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="text-rose-500 hover:bg-rose-50 p-3 rounded-xl transition" onclick="return confirm('Xóa bản ghi này?')">
+                            <button type="submit" onclick="return confirm('Bạn có chắc chắn muốn xóa?')" class="text-rose-500 hover:bg-rose-50 p-3 rounded-xl transition">
                                 <i class="fas fa-trash-alt text-xs"></i>
                             </button>
                         </form>
